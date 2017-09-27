@@ -10,7 +10,6 @@ def read(filename):
     lineNumber = int(random.uniform(0, len(words)));
     global gameWord
     gameWord = words[lineNumber].rstrip();
-    print(gameWord)
     return True
 
 def paint(hangManStatus):
@@ -21,6 +20,8 @@ def paint(hangManStatus):
     3:"hangman_body.txt",
     4:"hangman_legs.txt",
     5:"hangman_complete.txt",
+    6:"hangman_init.txt",
+    7:"hangman_success.txt"
     }
     try:
         hangman = open("hangman_ascii/" + d[hangManStatus], mode='rt', encoding='utf-8')
@@ -33,17 +34,31 @@ def gameLoop():
     gameStatus = True;
     hangmanStatus = 0;
     guess = '_' * len(gameWord);
-    guessAttempts = [];
     global outputVal
     outputVal = '_' * len(gameWord);
+    guessAttempts = [];
+    os.system('clear')
+    paint(6);
+    input("Press Enter to continue")
     while(gameStatus):
         os.system('clear')
         if((validateWord(guess)==False) & (round != 0)):
             hangmanStatus = hangmanStatus + 1;
+            if(hangmanStatus==5):
+                gameStatus=False
+                print(gameWord)
         paint(hangmanStatus)
-        guess = input("Guess letter or string")
-        guessAttempts = guessAttempts + list(set(guess));
+        print("Attempts: " + str(guessAttempts))
+        if(('_' in outputVal)==False):
+            os.system('clear')
+            print(gameWord)
+            gameStatus=False
+            paint(7);
+        if(gameStatus):
+            guess = input("Guess letter or string\n")
+            guessAttempts = guessAttempts + list(set(guess));
         round = round + 1;
+
 
 
 def validateWord(guess):
@@ -51,11 +66,12 @@ def validateWord(guess):
     wordMatch = False;
     for w in list(guess):
         for i, j in enumerate(list(gameWord)):
-            if j == w:
+            if str(j).upper() == str(w).upper():
                 outputVal = list(outputVal);
-                outputVal[i] = w;
+                outputVal[i] = j;
                 wordMatch = True;
-    print(''.join(outputVal));
+    outputVal = ''.join(outputVal)
+    print(outputVal);
     return wordMatch;
 
 
@@ -66,4 +82,3 @@ if (__name__ == '__main__'):
         gameLoop();
     except FileNotFoundError:
         print("File reading failed!")
-    print(paint(0))
