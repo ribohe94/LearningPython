@@ -48,7 +48,7 @@ def gameLoop():
                 gameStatus=False
                 print(gameWord)
         paint(hangmanStatus)
-        print("Attempts: " + str(guessAttempts))
+        print("Attempts: " + str(set(guessAttempts)))
         if(('_' in outputVal)==False):
             os.system('clear')
             print(gameWord)
