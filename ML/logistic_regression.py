@@ -12,19 +12,23 @@ def costFunction(X, y, weights):
     activation = activation.astype(np.float64)
     return (1 / m) * sum(-y * np.log10(activation) - (1 - y) * np.log10(1 - activation))
 
-def costFunctionGradient(X, y, weights):
+def costFunctionGradient(X, y, weights, alpha):
     m = np.size(X,0)
     activation = sigmoid(X.dot(weights)) - y #Activation function g(z)
     activation = activation.astype(np.float64) #Turn it into float64
     temp_weights = weights
-    temp_weights[0] = (1/m) * np.sum(activation) #Bias unit
+    temp_weights[0] = weights[0] - alpha * (1/m) * np.sum(activation) #Bias unit
     
     for j in range(1, np.size(weights)):
-        temp_weights[j] = (1/m) * np.sum(activation * X[:, j:j+1])
+        temp_weights[j] = weights[j] - alpha * (1/m) * np.sum(activation * X[:, j:j+1])
     
     print(costFunction(X,y,temp_weights)) #Let's see how the new parameters work
 
     return temp_weights
+
+def gradientDescent(X, y, weights, alpha, iterations):
+    for i in range(0, iterations):
+        weights = costFunctionGradient(X, y, weights, alpha)
 
 def plotData(data, xAxis, yAxis):
     survived = data[data['Survived'].isin([1])] #Passengers that survived
@@ -53,6 +57,9 @@ def main():
 
     #Initializing weights at 0!
     weights = np.zeros((np.size(X,1),1))
+
+    iterations = 1500
+    alpha = 0.01
     
     #plotData(data, 'PassengerId', 'Pclass')
         
@@ -61,7 +68,7 @@ def main():
     y = np.array(y.values) #Turn y into an ndarray for ease of usage
     y = np.reshape(y, [np.size(y),1]) #Reshape it into (size,1) nd array instead of (size,)
     print(costFunction(X, y, weights))
-    costFunctionGradient(X, y, weights)
+    gradientDescent(X, y, weights, alpha, iterations)
 
 if __name__ == '__main__':
     main()
