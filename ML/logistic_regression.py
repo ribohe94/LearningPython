@@ -22,13 +22,14 @@ def costFunctionGradient(X, y, weights, alpha):
     for j in range(1, np.size(weights)):
         temp_weights[j] = weights[j] - alpha * (1/m) * np.sum(activation * X[:, j:j+1])
     
-    print(costFunction(X,y,temp_weights)) #Let's see how the new parameters work
-
     return temp_weights
 
 def gradientDescent(X, y, weights, alpha, iterations):
+    print("Initial cost function: {0}".format(costFunction(X,y,weights)))
     for i in range(0, iterations):
         weights = costFunctionGradient(X, y, weights, alpha)
+    print("Final cost function: {0}".format(costFunction(X,y,weights)))
+    return weights
 
 def plotData(data, xAxis, yAxis):
     survived = data[data['Survived'].isin([1])] #Passengers that survived
@@ -67,8 +68,29 @@ def main():
     X = np.array(X.values) #Turn X into an ndarray for ease of usage
     y = np.array(y.values) #Turn y into an ndarray for ease of usage
     y = np.reshape(y, [np.size(y),1]) #Reshape it into (size,1) nd array instead of (size,)
-    print(costFunction(X, y, weights))
-    gradientDescent(X, y, weights, alpha, iterations)
+    optimized_weights = gradientDescent(X, y, weights, alpha, iterations)
+    
+
+    #Load test data
+    test_data = pd.read_csv('titanic_test.csv', header=0, names=headers, skipinitialspace=True, quotechar='"', skiprows=1)
+    test_y = pd.DataFrame(test_data['Survived'])
+    #x = passenger class, Fare
+    X_OPT = pd.DataFrame(test_data[['Pclass', 'Fare']])
+    X_OPT = (X_OPT - np.mean(X_OPT)) / np.std(X_OPT) #Normalizing data
+    X_OPT.insert(loc=0, column='Bias', value=1) #Adding column of 1's for the bias unit!
+    predictions = sigmoid(X_OPT.dot(optimized_weights))
+    test_y.insert(loc=0, column='Predictions', value=predictions)
+    print(test_y)
+
+    index = 0
+    for i in test_y['Predictions']:
+        count = 0
+        if(i > 0.5 and test_y['Survived'][index] == 1):
+            count += 1
+        elif(i <= 0.5 and test_y['Survived'][index] == 0):
+            count += 1
+        index += 1
+    print("Accuracy rate: {0}%".format((count * 100)/np.size(test_data,0)))
 
 if __name__ == '__main__':
     main()
