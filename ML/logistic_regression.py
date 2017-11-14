@@ -20,7 +20,6 @@ def costFunctionDerivative(X, y, weights, alpha):
     
     for j in range(0, np.size(weights)):
         temp_weights[j] = weights[j] - alpha * (1/m) * np.sum((sigmoid(X.dot(weights)) - y) * X[:, j:j+1])
-    print(costFunction(X, y, temp_weights))
     return temp_weights
 
 def gradientDescent(X, y, weights, alpha, iterations):
@@ -75,11 +74,11 @@ def main():
     test_y = pd.DataFrame(test_data['approved'])
     #x = passenger class, Fare
     X_OPT = pd.DataFrame(test_data[['exam1','exam2']])
-    X_OPT = (X_OPT - np.mean(X_OPT)) / np.std(X_OPT) #Normalizing data
     X_OPT.insert(loc=0, column='Bias', value=1) #Adding column of 1's for the bias unit!
     predictions = sigmoid(X_OPT.dot(optimized_weights))
     test_y.insert(loc=0, column='Predictions', value=predictions)
-    #print(test_y)
+    print(test_y)
+    #pdb.set_trace()
 
     index = 0
     for i in test_y['Predictions']:
