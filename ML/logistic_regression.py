@@ -30,7 +30,7 @@ def gradientDescent(X, y, weights, alpha, iterations):
     return weights
 
 def plotData(data, xAxis, yAxis):
-    approved = data[data['approved'].isin([1])] #Students that approved
+    approved = data[data['approved'].isin([1])] #Students that passed
     ded = data[data['approved'].isin([0])] #Slept with the fishes
     
     fig, ax = plt.subplots(figsize=(16,9))  
